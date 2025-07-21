@@ -37,6 +37,7 @@ type RouteParams = {
 
 export function List() {
   const [itemText, setItemText] = useState('');
+  const [valorItem, setValor] = useState('');
   const [items, setItems] = useState<ShoppingItem[]>([]);
   const navigation = useNavigation();
   const route = useRoute();
@@ -95,13 +96,22 @@ export function List() {
     }
   }
 
-  async function handleAddNewItem(itemText: string) {
+  async function handleAddNewItem() {
     try {
-      if (itemText.length < 2) {
+      if (itemText.length < 1) {
         return Alert.alert(
           'Criação de item',
-          'Não é possível criar um item com menos de 2 letras.'
+          'Não é possível criar um item vazio.'
         );
+      }
+
+      let valor: number | undefined = undefined;
+      if (valorItem.trim() !== '') {
+        const parsed = parseFloat(valorItem);
+        if (isNaN(parsed) || parsed < 0) {
+          return Alert.alert('Erro', 'Informe um valor válido para o item.')
+        }
+        valor = parsed;
       }
 
       const id = uuid.v4() as string;
@@ -110,9 +120,12 @@ export function List() {
         itemId: id,
         text: itemText,
         checked: false,
+        valorUnitario: valor,
+        quantidade: 1,
       };
 
       setItemText('');
+      setValor('');
       await itemCreateByList(newItem, listData.id);
       await fetchItemsByList();
     } catch (error) {
@@ -122,6 +135,38 @@ export function List() {
         console.log(error);
       }
     }
+  }
+
+  async function handleIncrementItem(itemId: string) {
+    const updatedItems = items.map((item) => {
+      if (item.itemId === itemId) {
+        const novaQuantidade = (item.quantidade || 1) + 1;
+        return {
+          ...item,
+          quantidade: novaQuantidade,
+          valorUnitario: (item.valorUnitario || 0) * novaQuantidade,
+        };
+      }
+      return item;
+    });
+
+    setItems(updatedItems);
+  }
+
+  async function handleDecrementItem(itemId: string) {
+    const updateItems = items.map((item) => {
+      if (item.itemId === itemId && (item.quantidade || 1) > 1) {
+        const novaQuantidade = (item.quantidade || 1) - 1;
+        return {
+          ...item,
+          quantidade: novaQuantidade,
+          valorUnitario: (item.valorUnitario || 0) / (novaQuantidade + 1) * novaQuantidade,
+        };
+      }
+      return item;
+    });
+
+    setItems(updateItems);
   }
 
   useFocusEffect(
@@ -141,22 +186,36 @@ export function List() {
         <Title>{listData.title}</Title>
         <Subtitle>Adicione itens a lista de compras</Subtitle>
 
-        <AddItemForm>
+        <AddItemForm style={{ flexDirection: 'column', gap: 8 }}>
           <TextField
-            placeholder="Adicione um novo item"
+            placeholder="Nome do item"
             value={itemText}
             onChangeText={setItemText}
           />
-          <AddButton onPress={() => handleAddNewItem(itemText)}>
+
+          <TextField
+            placeholder="Valor do item (R$)"
+            value={`R$ ${valorItem}`}
+            onChangeText={(text) => {
+              const clean = text.replace(/\D/g, '');
+              const number = (parseInt(clean) / 100).toFixed(2);
+              setValor(number.toString());
+            }}
+            keyboardType="numeric"
+          />
+
+
+          <AddButton onPress={handleAddNewItem}>
             <AddIcon />
           </AddButton>
         </AddItemForm>
 
+
+
         <ItemsHeaderContainer>
           <ItemsTitle>Compras</ItemsTitle>
-          <ItemsQuantity>{`Items: ${
-            items.length ? items.length : listData.items.length
-          }`}</ItemsQuantity>
+          <ItemsQuantity>{`Items: ${items.length ? items.length : listData.items.length
+            }`}</ItemsQuantity>
         </ItemsHeaderContainer>
 
         <FlatList
@@ -166,7 +225,8 @@ export function List() {
             <ListItem
               itemData={item}
               onDelete={() => handleDeleteItem(item.itemId, listData.id)}
-              onCheck={() => handleCheckItem(item.itemId, listData.id)}
+              onIncrement={() => handleIncrementItem(item.itemId)}
+              onDecrement={() => handleDecrementItem(item.itemId)}
             />
           )}
           contentContainerStyle={{ gap: 12 }}
@@ -174,6 +234,11 @@ export function List() {
             <ListEmpty message="Não Há nenhum item adicionado a lista. Adicione agora mesmo!" />
           )}
         />
+
+        <Text style={{ fontWeight: 'bold', fontSize: 18, marginTop: 16 }}>
+          Total: R$ {items.reduce((acc, item) => acc + (item.valorUnitario || 0), 0).toFixed(2)}
+        </Text>
+
 
         <Button
           text="remover lista"

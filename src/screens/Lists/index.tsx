@@ -20,6 +20,8 @@ export type ShoppingItem = {
   itemId: string;
   text: string;
   checked: boolean;
+  valorUnitario?: number;
+  quantidade?: number;
 };
 
 export interface ShoppingList {
