@@ -30,6 +30,7 @@ import { itemGetByList } from '../../storage/items/itemGetByList';
 import { AppError } from '../../utils/AppError';
 import { itemDeleteByList } from '../../storage/items/itemDeleteByList';
 import { itemCheckByList } from '../../storage/items/itemCheckByList';
+import { itemEditByList } from '../../storage/items/itemEditByList';
 
 type RouteParams = {
   listData: ShoppingList;
@@ -169,6 +170,17 @@ export function List() {
     setItems(updateItems);
   }
 
+  async function handleEditItem(itemId: string, newText: string, newValue?: number) {
+    try {
+      await itemEditByList(listData.id, itemId, newText, newValue);
+      await fetchItemsByList();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
   useFocusEffect(
     useCallback(() => {
       fetchItemsByList();
@@ -227,6 +239,9 @@ export function List() {
               onDelete={() => handleDeleteItem(item.itemId, listData.id)}
               onIncrement={() => handleIncrementItem(item.itemId)}
               onDecrement={() => handleDecrementItem(item.itemId)}
+              onEdit={(newText, newValue) =>
+                handleEditItem(item.itemId, newText, newValue)
+              }
             />
           )}
           contentContainerStyle={{ gap: 12 }}
