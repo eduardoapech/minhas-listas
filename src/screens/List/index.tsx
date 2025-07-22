@@ -1,4 +1,4 @@
-import { Alert, FlatList, Text } from "react-native";
+import { Alert, Button, FlatList, Text } from "react-native";
 import {
   AddButton,
   AddIcon,
@@ -28,6 +28,12 @@ import { itemGetByList } from "../../storage/items/itemGetByList";
 import { AppError } from "../../utils/AppError";
 import { itemDeleteByList } from "../../storage/items/itemDeleteByList";
 import { itemEditByList } from "../../storage/items/itemEditByList";
+import {
+  generatePDFFile,
+  savePDFToGallery,
+  sharePDF,
+} from "../../utils/pdf/../../utils/generateShoppingListPDF";
+
 
 type RouteParams = {
   listData: ShoppingList;
@@ -44,9 +50,7 @@ export function List() {
 
   async function fetchItemsByList() {
     try {
-      const itemsDataFromStorage: ShoppingItem[] = await itemGetByList(
-        listData.id
-      );
+      const itemsDataFromStorage: ShoppingItem[] = await itemGetByList(listData.id);
       itemsDataFromStorage.sort((a) => (a.checked ? 1 : -1));
       setItems(itemsDataFromStorage);
     } catch (error) {
@@ -69,10 +73,7 @@ export function List() {
   async function handleAddNewItem() {
     try {
       if (itemText.trim().length < 1) {
-        return Alert.alert(
-          "Criação de item",
-          "Não é possível criar um item vazio."
-        );
+        return Alert.alert("Criação de item", "Não é possível criar um item vazio.");
       }
 
       let valor: number | undefined = undefined;
@@ -115,14 +116,7 @@ export function List() {
 
     const novaQuantidade = (itemAtual.quantidade || 1) + 1;
 
-    await itemEditByList(
-      listData.id,
-      itemId,
-      itemAtual.text,
-      itemAtual.valorUnitario,
-      novaQuantidade
-    );
-
+    await itemEditByList(listData.id, itemId, itemAtual.text, itemAtual.valorUnitario, novaQuantidade);
     await fetchItemsByList();
   }
 
@@ -132,22 +126,11 @@ export function List() {
 
     const novaQuantidade = (itemAtual.quantidade || 1) - 1;
 
-    await itemEditByList(
-      listData.id,
-      itemId,
-      itemAtual.text,
-      itemAtual.valorUnitario,
-      novaQuantidade
-    );
-
+    await itemEditByList(listData.id, itemId, itemAtual.text, itemAtual.valorUnitario, novaQuantidade);
     await fetchItemsByList();
   }
 
-  async function handleEditItem(
-    itemId: string,
-    newText: string,
-    newValue?: number
-  ) {
+  async function handleEditItem(itemId: string, newText: string, newValue?: number) {
     try {
       await itemEditByList(listData.id, itemId, newText, newValue);
       await fetchItemsByList();
@@ -155,6 +138,30 @@ export function List() {
       console.log(error);
     }
   }
+
+
+  async function handleSavePDF() {
+    try {
+      const uri = await generatePDFFile(listData.title, items);
+      await savePDFToGallery(uri);
+      Alert.alert("Sucesso", "PDF salvo na galeria com sucesso!");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Erro", "Não foi possível salvar o PDF.");
+    }
+  }
+
+  async function handleSharePDF() {
+    try {
+      const uri = await generatePDFFile(listData.title, items);
+      await sharePDF(uri);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Erro", "Não foi possível compartilhar o PDF.");
+    }
+  }
+
+
 
   useFocusEffect(
     useCallback(() => {
@@ -170,14 +177,12 @@ export function List() {
         <Title>{listData.title}</Title>
         <Subtitle>Adicione itens à lista de compras</Subtitle>
 
-        <AddItemForm
-          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-        >
+        <AddItemForm style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <TextField
             placeholder="Nome do item"
             value={itemText}
             onChangeText={setItemText}
-            style={{ flex: 2 }} // ocupa mais espaço
+            style={{ flex: 2 }}
           />
 
           <TextField
@@ -190,13 +195,20 @@ export function List() {
               setValor(formatted);
             }}
             keyboardType="numeric"
-            style={{ flex: 1 }} // ocupa menos espaço
+            style={{ flex: 1 }}
           />
 
           <AddButton onPress={handleAddNewItem}>
             <AddIcon />
           </AddButton>
         </AddItemForm>
+
+        {/* ✅ Botão de geração de PDF aqui */}
+        <AddItemForm style={{ marginTop: 12, gap: 8 }}>
+          <Button title="📥 Salvar PDF" onPress={handleSavePDF} />
+          <Button title="📤 Compartilhar PDF" onPress={handleSharePDF} />
+        </AddItemForm>
+
 
         <ItemsHeaderContainer>
           <ItemsTitle>Compras</ItemsTitle>
@@ -212,9 +224,7 @@ export function List() {
               onDelete={() => handleDeleteItem(item.itemId, listData.id)}
               onIncrement={() => handleIncrementItem(item.itemId)}
               onDecrement={() => handleDecrementItem(item.itemId)}
-              onEdit={(newText, newValue) =>
-                handleEditItem(item.itemId, newText, newValue)
-              }
+              onEdit={(newText, newValue) => handleEditItem(item.itemId, newText, newValue)}
             />
           )}
           contentContainerStyle={{ gap: 12, paddingBottom: 40 }}
