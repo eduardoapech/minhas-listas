@@ -11,10 +11,11 @@ import { ListCard } from '../../components/ListCard';
 import { Button } from '../../components/Button';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
-import { FlatList } from 'react-native';
+import { Alert, FlatList } from 'react-native';
 import { listsGetAll } from '../../storage/list/listGetAll';
 import { Loading } from '../../components/Loading';
 import { ListEmpty } from '../../components/ListEmpty/indes';
+import { listRemove } from '../../storage/list/listRemove';
 
 export type ShoppingItem = {
   itemId: string;
@@ -51,6 +52,32 @@ export function Lists() {
     navigation.navigate('list', { listData: list });
   }
 
+  function handleDeleteList(listId: string) {
+    Alert.alert(
+      'Excluir lista',
+      'Tem certeza que deseja excluir esta lista?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await listRemove(listId);
+              fetchLists(); // recarrega as listas
+            } catch (error) {
+              console.log(error);
+              Alert.alert('Erro', 'Não foi possível excluir a lista.');
+            }
+          },
+        },
+      ]
+    );
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchLists();
@@ -82,7 +109,9 @@ export function Lists() {
                 itensQuantity={item.items.length}
                 title={item.title}
                 onPress={() => handleNavigateToList(item)}
+                onLongPress={() => handleDeleteList(item.id)} // nova ação
               />
+
             )}
             ListEmptyComponent={() => (
               <ListEmpty message="Nenhuma lista cadastrada. Adicione agora mesmo uma lista de compras." />

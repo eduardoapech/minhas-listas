@@ -205,8 +205,8 @@ export function List() {
 
         {/* ✅ Botão de geração de PDF aqui */}
         <AddItemForm style={{ marginTop: 12, gap: 8 }}>
-          <Button title="📥 Salvar PDF" onPress={handleSavePDF} />
-          <Button title="📤 Compartilhar PDF" onPress={handleSharePDF} />
+          <Button title="Salvar" onPress={handleSavePDF} />
+          <Button title="Compartilhar" onPress={handleSharePDF} />
         </AddItemForm>
 
 

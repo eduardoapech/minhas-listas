@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native';
-import { Plus } from 'phosphor-react-native';
+import { PlusIcon } from 'phosphor-react-native';
 
 export const Container = styled(SafeAreaView)`
   flex: 1;
@@ -81,7 +81,7 @@ export const ItemsQuantity = styled.Text`
   `};
 `;
 
-export const AddIcon = styled(Plus).attrs(({ theme }) => ({
+export const AddIcon = styled(PlusIcon).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
   size: theme.FONT_SIZE.MD,
 }))``;

@@ -20,7 +20,7 @@ export async function generatePDFFile(title: string, items: ShoppingItem[]): Pro
           ${items
             .map(
                 (item) =>
-                    `<li>${item.text} - Quantidade: ${item.quantidade ?? 1} - Valor: R$ ${item.valorUnitario?.toFixed(2) ?? "0.00"}</li>`
+                    `<li>${item.text} - Unidade: ${item.quantidade ?? 1} - Valor: R$ ${item.valorUnitario?.toFixed(2) ?? "0.00"}</li>`
             )
             .join("")}
         </ul>

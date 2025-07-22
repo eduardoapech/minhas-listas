@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/native';
 import { SafeAreaView } from 'react-native';
-import { ListPlus } from 'phosphor-react-native';
+import { PlusIcon } from 'phosphor-react-native';
 
 export const Container = styled(SafeAreaView)`
   flex: 1;
@@ -35,7 +35,7 @@ export const Subtitle = styled.Text`
   margin-bottom: 40px;
 `;
 
-export const ListAddIcon = styled(ListPlus).attrs(({ theme }) => ({
+export const ListAddIcon = styled(PlusIcon).attrs(({ theme }) => ({
   color: theme.COLORS.WHITE,
   size: theme.FONT_SIZE.XL,
   weight: 'bold',

@@ -26,7 +26,7 @@ export function ListCard({
       <CardTitle>{title}</CardTitle>
       <CardSubtitle>{`Criada em: ${createdAt}`}</CardSubtitle>
 
-      <BasketIcon />
+      {/* <BasketIcon /> */}
 
       {/* <CardBadgeContainer>
         <CardBadgeText>{`${itensQuantity} itens`}</CardBadgeText>
