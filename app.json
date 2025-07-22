@@ -19,6 +19,14 @@
       "bundleIdentifier": "com.challengefixed.nome"
     },
     "android": {
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO",
+        "MEDIA_LIBRARY"
+      ],
       "package": "com.challengefixed.nome",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
