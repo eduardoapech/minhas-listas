@@ -1,12 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ITEM_COLLECTION } from '../storageConfig';
-import { ShoppingItem } from '../../screens/Lists';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ITEM_COLLECTION } from "../storageConfig";
+import { ShoppingItem } from "../../screens/Lists";
 
 export async function itemEditByList(
   listId: string,
   itemId: string,
   newText: string,
-  newValue?: number
+  newValue?: number,
+  quantidade?: number
 ) {
   const storageKey = `${ITEM_COLLECTION}-${listId}`;
   const data = await AsyncStorage.getItem(storageKey);
@@ -15,12 +16,16 @@ export async function itemEditByList(
 
   const items: ShoppingItem[] = JSON.parse(data);
 
-  const updatedItems = items.map(item =>
+  const updatedItems = items.map((item) =>
     item.itemId === itemId
-      ? { ...item, text: newText, valorUnitario: newValue }
+      ? {
+          ...item,
+          text: newText,
+          valorUnitario: newValue,
+          quantidade: quantidade ?? item.quantidade,
+        }
       : item
   );
 
   await AsyncStorage.setItem(storageKey, JSON.stringify(updatedItems));
 }
-

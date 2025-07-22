@@ -1,7 +1,7 @@
-import styled, { css } from 'styled-components/native';
-import { TrashSimple } from 'phosphor-react-native';
-import { TouchableOpacity } from 'react-native';
-import Checkbox from 'expo-checkbox';
+import styled, { css } from "styled-components/native";
+import { TrashSimpleIcon } from "phosphor-react-native";
+import { TouchableOpacity } from "react-native";
+import Checkbox from "expo-checkbox";
 
 export const Container = styled.View`
   height: 50px;
@@ -37,7 +37,7 @@ export const DeleteButton = styled(TouchableOpacity)`
   padding: 0 8px;
 `;
 
-export const DeleteIcon = styled(TrashSimple).attrs(({ theme }) => ({
+export const DeleteIcon = styled(TrashSimpleIcon).attrs(({ theme }) => ({
   color: theme.COLORS.GRAY_600,
   size: theme.FONT_SIZE.LG,
 }))``;

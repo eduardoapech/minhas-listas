@@ -1,10 +1,6 @@
-import { useState } from 'react';
-import { ShoppingItem } from '../../screens/Lists';
-import {
-  Container,
-  DeleteButton,
-  DeleteIcon,
-} from './styles';
+import { useState } from "react";
+import { ShoppingItem } from "../../screens/Lists";
+import { Container, DeleteButton, DeleteIcon } from "./styles";
 import {
   View,
   Text,
@@ -13,7 +9,7 @@ import {
   Modal,
   TextInput,
   Button as RNButton,
-} from 'react-native';
+} from "react-native";
 
 type ListItemProps = {
   itemData: ShoppingItem;
@@ -32,30 +28,32 @@ export function ListItem({
 }: ListItemProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [editedText, setEditedText] = useState(itemData.text);
-  const [editedValue, setEditedValue] = useState(itemData.valorUnitario?.toFixed(2) || '');
+  const [editedValue, setEditedValue] = useState(
+    itemData.valorUnitario?.toFixed(2) || ""
+  );
 
   function handleDeleteConfirmation() {
     Alert.alert(
-      'Remover item',
+      "Remover item",
       `Deseja realmente remover o item "${itemData.text}" da lista?`,
       [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Sim', style: 'destructive', onPress: onDelete },
+        { text: "Cancelar", style: "cancel" },
+        { text: "Sim", style: "destructive", onPress: onDelete },
       ]
     );
   }
 
   function handleSaveEdit() {
-    if (editedText.trim() === '') {
-      Alert.alert('Erro', 'O nome do item não pode estar vazio.');
+    if (editedText.trim() === "") {
+      Alert.alert("Erro", "O nome do item não pode estar vazio.");
       return;
     }
 
     let value: number | undefined = undefined;
-    if (editedValue.trim() !== '') {
-      const parsed = parseFloat(editedValue.replace(',', '.'));
+    if (editedValue.trim() !== "") {
+      const parsed = parseFloat(editedValue.replace(",", "."));
       if (isNaN(parsed) || parsed < 0) {
-        Alert.alert('Erro', 'Informe um valor válido (ou deixe em branco).');
+        Alert.alert("Erro", "Informe um valor válido (ou deixe em branco).");
         return;
       }
       value = parsed;
@@ -65,50 +63,82 @@ export function ListItem({
     setModalVisible(false);
   }
 
-
   return (
     <>
       <TouchableOpacity onLongPress={() => setModalVisible(true)}>
         <Container>
-          <View style={{
-            flex: 1,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap'
-          }}>
-            {/* NOME DO ITEM */}
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            {/* PRODUTO */}
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
               style={{
                 flex: 1,
                 fontSize: 16,
-                color: 'white',
-                marginRight: 12,
+                color: "white",
               }}
             >
-              {itemData.text || 'Sem nome'}
+              {itemData.text || "Sem nome"}
             </Text>
 
-            {/* VALOR E QUANTIDADE */}
-            <Text style={{ fontSize: 14, color: '#ccc', marginRight: 40 }}>
-              R$ {(itemData.valorUnitario || 0).toFixed(2)} {itemData.quantidade || 1}x
+            {/* PREÇO */}
+            <Text
+              style={{
+                width: 80,
+                fontSize: 14,
+                color: "#ccc",
+                textAlign: "center",
+              }}
+            >
+              R$ {(itemData.valorUnitario || 0).toFixed(2)}
             </Text>
 
             {/* UNIDADES */}
-            <Text style={{ fontSize: 16, color: 'white', marginHorizontal: 5, flexShrink: 1 }}>
+            <Text
+              style={{
+                width: 70,
+                fontSize: 16,
+                color: "white",
+                textAlign: "center",
+              }}
+            >
               {`${itemData.quantidade || 1} un`}
             </Text>
 
             {/* BOTÕES + / - */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-              <TouchableOpacity onPress={onDecrement} style={{ marginHorizontal: 0 }}>
-                <Text style={{ fontSize: 20, color: 'white', marginHorizontal: 15 }}>−</Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <TouchableOpacity
+                onPress={onDecrement}
+                style={{
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  backgroundColor: "#e74c3c",
+                  borderRadius: 6,
+                }}
+              >
+                <Text style={{ fontSize: 18, color: "white" }}>−</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={onIncrement}>
-                <Text style={{ fontSize: 20, color: 'white' }}>+</Text>
+              <TouchableOpacity
+                onPress={onIncrement}
+                style={{
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  backgroundColor: "#2ecc71",
+                  borderRadius: 6,
+                }}
+              >
+                <Text style={{ fontSize: 18, color: "white" }}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -127,8 +157,21 @@ export function ListItem({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000000aa' }}>
-          <View style={{ backgroundColor: '#fff', margin: 20, padding: 20, borderRadius: 8 }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "#000000aa",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              margin: 20,
+              padding: 20,
+              borderRadius: 8,
+            }}
+          >
             <Text style={{ fontSize: 18, marginBottom: 10 }}>Editar item</Text>
 
             <TextInput
@@ -147,7 +190,11 @@ export function ListItem({
             />
 
             <RNButton title="Salvar" onPress={handleSaveEdit} />
-            <RNButton title="Cancelar" color="red" onPress={() => setModalVisible(false)} />
+            <RNButton
+              title="Cancelar"
+              color="red"
+              onPress={() => setModalVisible(false)}
+            />
           </View>
         </View>
       </Modal>
